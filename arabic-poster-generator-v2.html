@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مولّد البوسترات العربية — Abdulluh.X</title>
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&family=Tajawal:wght@400;700;900&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<style>
+  :root {
+    --bg: #060810;
+    --surface: #0d1117;
+    --surface2: #161b27;
+    --border: #1e2536;
+    --accent: #6c63ff;
+    --accent2: #ff6584;
+    --gold: #f5c518;
+    --text: #e8eaf6;
+    --muted: #5c6480;
+    --success: #00e676;
+    --error: #ff5252;
+    --warn: #ffa726;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Cairo', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 80% 50% at 20% 20%, rgba(108,99,255,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 40% at 80% 80%, rgba(255,101,132,0.05) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 16px 60px;
+  }
+
+  /* ===== HERO ===== */
+  .hero {
+    text-align: center;
+    margin-bottom: 32px;
+    padding: 40px 24px 36px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2), var(--gold));
+  }
+
+  .hero-icon { font-size: 3rem; display: block; margin-bottom: 12px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-7px)} }
+
+  .hero h1 {
+    font-family: 'Tajawal', sans-serif;
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 900;
+    background: linear-gradient(135deg, #fff 0%, var(--accent) 50%, var(--accent2) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+
+  .hero p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; max-width: 500px; margin: 0 auto 16px; }
+
+  .badge {
+    display: inline-flex; align-items: center; gap: 6px;
+    background: rgba(108,99,255,0.15);
+    border: 1px solid rgba(108,99,255,0.3);
+    color: #a79fff;
+    font-size: 0.75rem; font-weight: 700;
+    padding: 4px 14px; border-radius: 999px;
+  }
+
+  /* ===== CARD ===== */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+
+  .section-label {
+    font-size: 0.75rem; font-weight: 700;
+    color: var(--accent); text-transform: uppercase;
+    letter-spacing: 2px; margin-bottom: 14px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .section-label::before { content:''; width:16px; height:2px; background:var(--accent); border-radius:2px; }
+
+  /* ===== API KEY ===== */
+  .input-row { display: flex; gap: 10px; align-items: center; }
+
+  .inp {
+    flex: 1;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 12px; color: var(--text);
+    font-family: 'Cairo', sans-serif; font-size: 0.95rem;
+    padding: 12px 16px; outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    direction: ltr; text-align: left;
+  }
+  .inp:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(108,99,255,0.15); }
+  .inp::placeholder { color: var(--muted); }
+
+  .icon-btn {
+    background: var(--surface2); border: 1.5px solid var(--border);
+    color: var(--muted); border-radius: 10px;
+    padding: 12px 14px; cursor: pointer; font-size: 1rem;
+    transition: all 0.2s; white-space: nowrap;
+  }
+  .icon-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .hint { margin-top: 8px; font-size: 0.75rem; color: var(--muted); line-height: 1.6; }
+  .hint a { color: var(--accent); }
+
+  /* ===== SETTINGS ROW ===== */
+  .settings-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; }
+
+  .field label { display:block; font-size:0.75rem; color:var(--muted); margin-bottom:7px; font-weight:600; }
+
+  .field select, .field input[type="number"] {
+    width: 100%;
+    background: var(--surface2); border: 1.5px solid var(--border);
+    border-radius: 10px; color: var(--text);
+    font-family: 'Cairo', sans-serif; font-size: 0.88rem;
+    padding: 10px 12px; outline: none; transition: border-color 0.2s;
+  }
+  .field select:focus, .field input[type="number"]:focus { border-color: var(--accent); }
+
+  /* ===== SOURCE TABS ===== */
+  .tabs { display: flex; gap: 8px; margin-bottom: 16px; }
+
+  .tab {
+    flex: 1; padding: 10px; border-radius: 10px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    color: var(--muted); font-family: 'Cairo', sans-serif;
+    font-size: 0.85rem; font-weight: 700; cursor: pointer;
+    transition: all 0.2s; text-align: center;
+  }
+  .tab.active { border-color: var(--accent); background: rgba(108,99,255,0.12); color: var(--accent); }
+
+  /* ===== CHECKLIST ===== */
+  .checklist-toolbar {
+    display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;
+  }
+
+  .tiny-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--muted); border-radius: 8px; padding: 5px 12px;
+    font-family: 'Cairo', sans-serif; font-size: 0.75rem; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .tiny-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  .search-inp {
+    flex: 1; min-width: 140px;
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; color: var(--text);
+    font-family: 'Cairo', sans-serif; font-size: 0.82rem;
+    padding: 5px 12px; outline: none; direction: rtl;
+    transition: border-color 0.2s;
+  }
+  .search-inp:focus { border-color: var(--accent); }
+  .search-inp::placeholder { color: var(--muted); }
+
+  .checklist-wrap {
+    max-height: 280px; overflow-y: auto;
+    border: 1px solid var(--border); border-radius: 12px;
+    padding: 8px;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+
+  .check-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 7px 10px; border-radius: 8px;
+    cursor: pointer; transition: background 0.15s;
+    user-select: none;
+  }
+  .check-item:hover { background: var(--surface2); }
+  .check-item.hidden { display: none; }
+
+  .check-item input[type="checkbox"] { display: none; }
+
+  .check-box {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid var(--border);
+    background: var(--surface2);
+    flex-shrink: 0;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.15s;
+    font-size: 0.7rem;
+  }
+
+  .check-item.checked .check-box {
+    background: var(--accent); border-color: var(--accent); color: #fff;
+  }
+
+  .check-name { font-size: 0.85rem; color: var(--text); flex: 1; }
+  .check-count { font-size: 0.72rem; color: var(--muted); }
+
+  /* Custom textarea */
+  .custom-area {
+    width: 100%; background: var(--surface2);
+    border: 1.5px solid var(--border); border-radius: 12px;
+    color: var(--text); font-family: 'Cairo', sans-serif;
+    font-size: 0.9rem; padding: 12px 14px; outline: none;
+    resize: vertical; min-height: 120px; direction: rtl;
+    transition: border-color 0.2s;
+  }
+  .custom-area:focus { border-color: var(--accent); }
+
+  /* ===== BUTTONS ===== */
+  .main-btn {
+    width: 100%; border: none; border-radius: 14px;
+    font-family: 'Cairo', sans-serif; font-size: 1.05rem; font-weight: 900;
+    padding: 16px; cursor: pointer; transition: all 0.3s;
+    margin-bottom: 12px; display: flex; align-items: center;
+    justify-content: center; gap: 10px; position: relative; overflow: hidden;
+  }
+  .main-btn::before { content:''; position:absolute; inset:0; background:linear-gradient(135deg,rgba(255,255,255,0.08),transparent); opacity:0; transition:opacity 0.3s; }
+  .main-btn:hover::before { opacity:1; }
+  .main-btn:hover { transform: translateY(-2px); }
+  .main-btn:active { transform: translateY(0); }
+  .main-btn:disabled { background: var(--surface2) !important; color: var(--muted) !important; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+  .btn-start { background: linear-gradient(135deg, var(--accent), #8b5cf6); color: #fff; }
+  .btn-start:not(:disabled):hover { box-shadow: 0 10px 35px rgba(108,99,255,0.4); }
+
+  .btn-dl { background: linear-gradient(135deg, #00c853, #00e676); color: #000; }
+  .btn-dl:not(:disabled):hover { box-shadow: 0 10px 35px rgba(0,230,118,0.35); }
+
+  /* ===== PROGRESS ===== */
+  .progress-card { display: none; }
+  .progress-card.show { display: block; }
+
+  .progress-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
+  .progress-label { font-size: 0.88rem; color: var(--muted); }
+  .progress-pct { font-size: 1.1rem; font-weight: 900; color: var(--accent); }
+
+  .pbar { height: 8px; background: var(--surface2); border-radius: 999px; overflow: hidden; margin-bottom: 10px; }
+  .pbar-fill {
+    height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2));
+    border-radius: 999px; transition: width 0.3s ease; width: 0%; position: relative; overflow: hidden;
+  }
+  .pbar-fill::after { content:''; position:absolute; inset:0; background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent); animation:shimmer 1.5s infinite; }
+  @keyframes shimmer { 0%{transform:translateX(-100%)} 100%{transform:translateX(200%)} }
+
+  .pstats { display:flex; gap:16px; font-size:0.78rem; flex-wrap:wrap; }
+  .pstat { display:flex; align-items:center; gap:5px; color: var(--muted); }
+  .pdot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+
+  /* ===== POSTER GRID ===== */
+  .poster-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+  }
+
+  .poster-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px; overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+    animation: popIn 0.35s ease forwards; opacity: 0;
+  }
+  @keyframes popIn { from{opacity:0;transform:scale(0.95) translateY(8px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  .poster-card:hover { transform: translateY(-4px); border-color: var(--accent); }
+
+  .poster-img-wrap { position: relative; }
+
+  .poster-img {
+    width: 100%; aspect-ratio: 2/3;
+    object-fit: cover; display: block;
+    background: var(--surface2);
+  }
+
+  .poster-img-placeholder {
+    width: 100%; aspect-ratio: 2/3;
+    background: var(--surface2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 2rem;
+  }
+
+  /* زر نسخ الرابط */
+  .copy-btn {
+    position: absolute; top: 6px; left: 6px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px; color: #fff;
+    font-size: 0.72rem; padding: 4px 8px;
+    cursor: pointer; backdrop-filter: blur(8px);
+    transition: all 0.2s; display: none;
+    font-family: 'Cairo', sans-serif; font-weight: 600;
+  }
+  .poster-card:hover .copy-btn { display: block; }
+  .copy-btn:hover { background: rgba(108,99,255,0.8); border-color: var(--accent); }
+  .copy-btn.copied { background: rgba(0,230,118,0.8); border-color: var(--success); color: #000; }
+
+  .poster-name {
+    padding: 7px 9px 3px;
+    font-size: 0.75rem; font-weight: 700; color: var(--text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .poster-status {
+    padding: 0 9px 7px;
+    font-size: 0.65rem; display: flex; align-items: center; gap: 3px;
+  }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    text-align: center; margin-top: 48px;
+    padding: 24px 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted); font-size: 0.8rem; line-height: 2;
+  }
+
+  .footer .owner {
+    font-family: 'Tajawal', sans-serif;
+    font-size: 1.1rem; font-weight: 900;
+    background: linear-gradient(135deg, var(--gold), var(--accent2));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    display: block; margin-bottom: 4px;
+  }
+
+  .footer a { color: var(--accent); text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  .tg-btn {
+    display: inline-flex; align-items: center; gap: 7px;
+    background: linear-gradient(135deg, #0088cc, #229ED9);
+    color: #fff; padding: 8px 18px; border-radius: 10px;
+    font-weight: 700; font-size: 0.88rem; margin-top: 10px;
+    text-decoration: none !important; transition: all 0.2s;
+  }
+  .tg-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,136,204,0.4); }
+
+  /* ===== TOAST ===== */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 11px 18px;
+    font-size: 0.85rem; color: var(--text);
+    z-index: 9999; transition: transform 0.3s;
+    display: flex; align-items: center; gap: 7px;
+    max-width: 320px; text-align: center;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+  .toast.ok { border-color: var(--success); }
+  .toast.err { border-color: var(--error); }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <span class="hero-icon">🎬</span>
+    <div class="badge">✨ مدعوم بـ Gemini AI</div>
+    <h1>مولّد البوسترات العربية</h1>
+    <p>أدخل مفتاح Gemini API، اختر المجموعات التي تريدها، وسيولّد الذكاء الاصطناعي بوسترات سينمائية عربية احترافية</p>
+  </div>
+
+  <!-- API KEY -->
+  <div class="card">
+    <div class="section-label">مفتاح Gemini API</div>
+    <div class="input-row">
+      <input class="inp" id="apiKey" type="password" placeholder="AIza..." autocomplete="off" spellcheck="false">
+      <button class="icon-btn" onclick="toggleKey()">👁️</button>
+    </div>
+    <div class="hint">
+      🔒 مفتاحك يُستخدم في متصفحك فقط ولا يُرسل لأي جهة.
+      احصل على مفتاح مجاني من
+      <a href="https://aistudio.google.com/app/apikey" target="_blank">Google AI Studio ↗</a>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="card">
+    <div class="section-label">إعدادات التوليد</div>
+    <div class="settings-row">
+      <div class="field">
+        <label>نمط البوستر</label>
+        <select id="styleSelect">
+          <option value="cinematic">🎥 سينمائي داكن</option>
+          <option value="dramatic">🔥 دراما وألوان جريئة</option>
+          <option value="minimal">✨ مينيمال أنيق</option>
+          <option value="vintage">🎞️ كلاسيكي قديم</option>
+          <option value="scifi">🚀 خيال علمي مستقبلي</option>
+          <option value="horror">👻 رعب ومظلم</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>جودة الصورة</label>
+        <select id="qualitySelect">
+          <option value="standard">عادية (أسرع)</option>
+          <option value="hd" selected>عالية (HD)</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- SOURCE -->
+  <div class="card">
+    <div class="section-label">اختيار المجموعات</div>
+
+    <div class="tabs">
+      <div class="tab active" id="tabFusion" onclick="switchTab('fusion')">📋 Fusion Collections</div>
+      <div class="tab" id="tabCustom" onclick="switchTab('custom')">✏️ قائمة مخصصة</div>
+    </div>
+
+    <!-- Fusion Checklist -->
+    <div id="fusionSection">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;flex-wrap:wrap;gap:8px">
+        <div style="font-size:0.8rem;color:var(--muted)" id="selectedCount">جاري التحميل...</div>
+        <div style="font-size:0.75rem;color:var(--muted)" id="loadStatus"></div>
+      </div>
+      <div class="checklist-toolbar">
+        <button class="tiny-btn" onclick="selectAll()">☑️ تحديد الكل</button>
+        <button class="tiny-btn" onclick="deselectAll()">⬜ إلغاء الكل</button>
+        <input class="search-inp" id="searchInp" placeholder="🔍 ابحث عن مجموعة..." oninput="filterList()">
+      </div>
+      <div class="checklist-wrap" id="checklistWrap">
+        <div style="text-align:center;padding:30px;color:var(--muted);font-size:0.85rem">
+          ⏳ جاري تحميل القائمة...
+        </div>
+      </div>
+    </div>
+
+    <!-- Custom -->
+    <div id="customSection" style="display:none">
+      <label style="font-size:0.78rem;color:var(--muted);display:block;margin-bottom:8px;font-weight:600">أسماء المجموعات بالعربية (سطر لكل اسم)</label>
+      <textarea class="custom-area" id="customNames" placeholder="حرب النجوم&#10;العراب&#10;أفينجرز&#10;هاري بوتر&#10;جون ويك&#10;..."></textarea>
+    </div>
+  </div>
+
+  <!-- BUTTONS -->
+  <button class="main-btn btn-start" id="startBtn" onclick="startGeneration()">
+    🚀 ابدأ توليد البوسترات
+  </button>
+  <button class="main-btn btn-dl" id="dlBtn" disabled onclick="downloadZip()">
+    ⬇️ تنزيل الكل ZIP
+  </button>
+
+  <!-- PROGRESS -->
+  <div class="card progress-card" id="progressCard">
+    <div class="progress-header">
+      <div class="progress-label" id="progressText">جاري التوليد...</div>
+      <div class="progress-pct" id="progressPct">0%</div>
+    </div>
+    <div class="pbar"><div class="pbar-fill" id="progressFill"></div></div>
+    <div class="pstats">
+      <div class="pstat"><div class="pdot" style="background:var(--success)"></div><span id="sDone">0 تم</span></div>
+      <div class="pstat"><div class="pdot" style="background:var(--error)"></div><span id="sFail">0 فشل</span></div>
+      <div class="pstat"><div class="pdot" style="background:var(--muted)"></div><span id="sLeft">0 متبقي</span></div>
+    </div>
+  </div>
+
+  <!-- POSTER GRID -->
+  <div class="poster-grid" id="posterGrid"></div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span class="owner">Abdulluh.X</span>
+    <div>🎬 مولّد البوسترات العربية بالذكاء الاصطناعي</div>
+    <div style="margin-top:4px">
+      <a href="https://t.me/plex_arab" target="_blank">مجتمع Plex Arab</a>
+      &nbsp;•&nbsp;
+      <a href="https://aistudio.google.com/app/apikey" target="_blank">احصل على API Key مجاني</a>
+      &nbsp;•&nbsp;
+      <a href="https://github.com/hfip/kometa-config-images" target="_blank">GitHub</a>
+    </div>
+    <a class="tg-btn" href="https://t.me/Abdulluh_X" target="_blank">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.447 1.394c-.16.16-.295.295-.605.295l.213-3.053 5.56-5.023c.242-.213-.054-.333-.373-.12l-6.871 4.326-2.962-.924c-.643-.204-.657-.643.136-.953l11.57-4.461c.537-.194 1.006.131.833.941z"/></svg>
+      @Abdulluh_X
+    </a>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== STATE =====
+let allCollections = [];
+let checkedNames = new Set();
+let generatedImages = {};
+let zipBlob = null;
+let isRunning = false;
+let currentTab = 'fusion';
+
+// ===== TOAST =====
+function toast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast show ${type}`;
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+// ===== API KEY TOGGLE =====
+function toggleKey() {
+  const i = document.getElementById('apiKey');
+  i.type = i.type === 'password' ? 'text' : 'password';
+}
+
+// ===== TABS =====
+function switchTab(tab) {
+  currentTab = tab;
+  document.getElementById('tabFusion').className = `tab ${tab === 'fusion' ? 'active' : ''}`;
+  document.getElementById('tabCustom').className = `tab ${tab === 'custom' ? 'active' : ''}`;
+  document.getElementById('fusionSection').style.display = tab === 'fusion' ? 'block' : 'none';
+  document.getElementById('customSection').style.display = tab === 'custom' ? 'block' : 'none';
+}
+
+// ===== LOAD COLLECTIONS =====
+async function loadCollections() {
+  try {
+    document.getElementById('loadStatus').textContent = '⏳ يتصل...';
+    const res = await fetch('https://raw.githubusercontent.com/djdirty60/Fusion/refs/heads/main/collection/collections.json');
+    const data = await res.json();
+    allCollections = data.map(c => c.name).filter(Boolean);
+
+    renderChecklist(allCollections);
+    // تحديد أول 20 افتراضياً
+    allCollections.slice(0, 20).forEach(n => checkedNames.add(n));
+    updateCheckUI();
+    updateSelectedCount();
+    document.getElementById('loadStatus').textContent = `✅ ${allCollections.length} مجموعة`;
+  } catch(e) {
+    document.getElementById('checklistWrap').innerHTML =
+      `<div style="text-align:center;padding:30px;color:var(--error);font-size:0.85rem">❌ فشل تحميل القائمة — تأكد من الاتصال</div>`;
+    document.getElementById('loadStatus').textContent = '❌ فشل';
+  }
+}
+
+function renderChecklist(names) {
+  const wrap = document.getElementById('checklistWrap');
+  wrap.innerHTML = names.map(n => `
+    <div class="check-item ${checkedNames.has(n) ? 'checked' : ''}" data-name="${n}" onclick="toggleItem(this)">
+      <div class="check-box">${checkedNames.has(n) ? '✓' : ''}</div>
+      <div class="check-name">${n}</div>
+    </div>
+  `).join('');
+}
+
+function toggleItem(el) {
+  const name = el.dataset.name;
+  if (checkedNames.has(name)) {
+    checkedNames.delete(name);
+    el.classList.remove('checked');
+    el.querySelector('.check-box').textContent = '';
+  } else {
+    checkedNames.add(name);
+    el.classList.add('checked');
+    el.querySelector('.check-box').textContent = '✓';
+  }
+  updateSelectedCount();
+}
+
+function updateCheckUI() {
+  document.querySelectorAll('.check-item').forEach(el => {
+    const checked = checkedNames.has(el.dataset.name);
+    el.classList.toggle('checked', checked);
+    el.querySelector('.check-box').textContent = checked ? '✓' : '';
+  });
+}
+
+function updateSelectedCount() {
+  const visible = document.querySelectorAll('.check-item:not(.hidden)').length;
+  document.getElementById('selectedCount').textContent =
+    `✅ ${checkedNames.size} محددة من ${allCollections.length}`;
+}
+
+function selectAll() {
+  document.querySelectorAll('.check-item:not(.hidden)').forEach(el => {
+    checkedNames.add(el.dataset.name);
+    el.classList.add('checked');
+    el.querySelector('.check-box').textContent = '✓';
+  });
+  updateSelectedCount();
+}
+
+function deselectAll() {
+  document.querySelectorAll('.check-item:not(.hidden)').forEach(el => {
+    checkedNames.delete(el.dataset.name);
+    el.classList.remove('checked');
+    el.querySelector('.check-box').textContent = '';
+  });
+  updateSelectedCount();
+}
+
+function filterList() {
+  const q = document.getElementById('searchInp').value.toLowerCase();
+  document.querySelectorAll('.check-item').forEach(el => {
+    const match = el.dataset.name.toLowerCase().includes(q);
+    el.classList.toggle('hidden', !match);
+  });
+  updateSelectedCount();
+}
+
+// ===== GENERATE POSTER =====
+async function generatePoster(apiKey, name, style) {
+  const styles = {
+    cinematic: 'dark cinematic, dramatic shadows, film noir, atmospheric depth',
+    dramatic: 'bold dramatic colors, high contrast, epic scale, intense atmosphere',
+    minimal: 'clean minimal, elegant, modern, generous negative space, subtle colors',
+    vintage: 'vintage retro poster, aged texture, classic Hollywood, warm sepia tones',
+    scifi: 'futuristic sci-fi, neon glow, cosmic space, holographic effects',
+    horror: 'dark horror, eerie shadows, blood red accents, disturbing atmosphere',
+  };
+
+  const prompt = `Professional Arabic movie collection poster for "${name}".
+Visual style: ${styles[style] || styles.cinematic}.
+CRITICAL: Display the Arabic name "${name}" prominently in large beautiful Arabic calligraphy typography.
+Requirements: portrait 2:3 ratio, cinematic quality, rich atmospheric background matching the collection theme, NO English text, dramatic lighting, professional movie poster composition.`;
+
+  const resp = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${apiKey}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        instances: [{ prompt }],
+        parameters: { sampleCount: 1, aspectRatio: '2:3', safetySetting: 'block_only_high' }
+      })
+    }
+  );
+
+  if (!resp.ok) {
+    const err = await resp.json().catch(() => ({}));
+    const msg = err?.error?.message || `خطأ ${resp.status}`;
+    throw new Error(msg);
+  }
+
+  const data = await resp.json();
+  const b64 = data?.predictions?.[0]?.bytesBase64Encoded;
+  if (!b64) throw new Error('لم تُولَّد صورة');
+  return b64;
+}
+
+// ===== COPY URL =====
+async function copyImageUrl(b64, btn) {
+  try {
+    // نسخ كـ data URL
+    const dataUrl = `data:image/png;base64,${b64}`;
+    await navigator.clipboard.writeText(dataUrl);
+    btn.textContent = '✅ تم النسخ';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 نسخ الرابط';
+      btn.classList.remove('copied');
+    }, 2000);
+  } catch {
+    // fallback
+    const ta = document.createElement('textarea');
+    ta.value = `data:image/png;base64,${b64.slice(0, 50)}...`;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ تم';
+    setTimeout(() => btn.textContent = '📋 نسخ الرابط', 2000);
+  }
+}
+
+// ===== MAIN GENERATION =====
+async function startGeneration() {
+  if (isRunning) return;
+
+  const apiKey = document.getElementById('apiKey').value.trim();
+  if (!apiKey) { toast('⚠️ أدخل مفتاح API أولاً', 'err'); return; }
+
+  const style = document.getElementById('styleSelect').value;
+  let names = [];
+
+  if (currentTab === 'fusion') {
+    names = [...checkedNames];
+    if (!names.length) { toast('⚠️ اختر مجموعة واحدة على الأقل', 'err'); return; }
+  } else {
+    const raw = document.getElementById('customNames').value.trim();
+    if (!raw) { toast('⚠️ أدخل أسماء المجموعات', 'err'); return; }
+    names = raw.split('\n').map(s => s.trim()).filter(Boolean);
+  }
+
+  isRunning = true;
+  generatedImages = {};
+  zipBlob = null;
+
+  document.getElementById('startBtn').disabled = true;
+  document.getElementById('dlBtn').disabled = true;
+  document.getElementById('progressCard').classList.add('show');
+  document.getElementById('posterGrid').innerHTML = '';
+
+  const total = names.length;
+  let done = 0, failed = 0;
+
+  for (let i = 0; i < total; i++) {
+    const name = names[i];
+    const pct = Math.round((i / total) * 100);
+
+    document.getElementById('progressFill').style.width = pct + '%';
+    document.getElementById('progressPct').textContent = pct + '%';
+    document.getElementById('progressText').textContent = `⏳ ${name}`;
+    document.getElementById('sDone').textContent = `${done} تم`;
+    document.getElementById('sFail').textContent = `${failed} فشل`;
+    document.getElementById('sLeft').textContent = `${total - i} متبقي`;
+
+    // Card placeholder
+    const card = document.createElement('div');
+    card.className = 'poster-card';
+    card.innerHTML = `
+      <div class="poster-img-wrap">
+        <div class="poster-img-placeholder">⏳</div>
+      </div>
+      <div class="poster-name">${name}</div>
+      <div class="poster-status" style="color:var(--muted)">🔄 جاري...</div>
+    `;
+    document.getElementById('posterGrid').appendChild(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+    try {
+      const b64 = await generatePoster(apiKey, name, style);
+      generatedImages[name] = b64;
+      done++;
+
+      card.innerHTML = `
+        <div class="poster-img-wrap">
+          <img class="poster-img" src="data:image/png;base64,${b64}" loading="lazy">
+          <button class="copy-btn" onclick="copyImageUrl('${b64.slice(0,20)}...', this)" data-b64="${name}">📋 نسخ الرابط</button>
+        </div>
+        <div class="poster-name">${name}</div>
+        <div class="poster-status" style="color:var(--success)">✅ تم التوليد</div>
+      `;
+
+      // ربط زر النسخ بالـ base64 الكامل
+      const copyBtn = card.querySelector('.copy-btn');
+      copyBtn.onclick = () => copyImageUrl(b64, copyBtn);
+
+    } catch(e) {
+      failed++;
+      const isKeyErr = /401|403|API_KEY|invalid/i.test(e.message);
+      card.innerHTML = `
+        <div class="poster-img-placeholder" style="background:#1a0a0a">❌</div>
+        <div class="poster-name">${name}</div>
+        <div class="poster-status" style="color:var(--error)">❌ ${e.message.slice(0,35)}</div>
+      `;
+      if (isKeyErr) { toast('❌ مفتاح API غير صحيح', 'err'); break; }
+    }
+
+    if (i < total - 1) await new Promise(r => setTimeout(r, 1500));
+  }
+
+  // انتهى
+  document.getElementById('progressFill').style.width = '100%';
+  document.getElementById('progressPct').textContent = '100%';
+  document.getElementById('progressText').textContent = `✅ ${done} بوستر • ❌ ${failed} فشل`;
+  document.getElementById('sDone').textContent = `${done} تم`;
+  document.getElementById('sFail').textContent = `${failed} فشل`;
+  document.getElementById('sLeft').textContent = '0 متبقي';
+
+  if (done > 0) {
+    const zip = new JSZip();
+    const folder = zip.folder('arabic_posters');
+    for (const [name, b64] of Object.entries(generatedImages)) {
+      folder.file(`${name.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g,'_')}.png`, b64, { base64: true });
+    }
+    zipBlob = await zip.generateAsync({ type:'blob', compression:'DEFLATE', compressionOptions:{level:4} });
+    document.getElementById('dlBtn').disabled = false;
+    toast(`🎉 ${done} بوستر جاهز!`, 'ok');
+  }
+
+  document.getElementById('startBtn').disabled = false;
+  isRunning = false;
+}
+
+function downloadZip() {
+  if (!zipBlob) return;
+  const url = URL.createObjectURL(zipBlob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'arabic_posters_by_AbdulluhX.zip';
+  document.body.appendChild(a); a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 3000);
+}
+
+// ===== INIT =====
+loadCollections();
+</script>
+</body>
+</html>
