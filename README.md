@@ -21,4 +21,4 @@ Small, self-contained HTML tools for Arabic media libraries. No build step, no s
 
 ## License
 
-Not specified yet.
+MIT © 2026 Abdulluh.X (hfip) — see [LICENSE](LICENSE).
